@@ -31,10 +31,11 @@ exports.addRequest = function(req, res) {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
-                console.log('Success: ' + JSON.stringify(result));
+                collection.find({cust_id: query.cust_id,request_status:"pending"}).toArray(function(err, items) {
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
-                res.send(result);
+                res.send(items);
+                });
             }
         });
     });
@@ -77,6 +78,18 @@ exports.getBidsForRequest = function(req, res) {
     
 };
 
+
+exports.getreqstatusrewards = function(req, res) {
+    var userid = req.params.userid;
+    db.collection('rewardrequest', function(err, collection) {
+        collection.find({cust_id: userid}).toArray(function(err, items) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
+                res.send(items);
+        });
+    });
+    
+};
 
 
 
