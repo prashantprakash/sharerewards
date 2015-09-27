@@ -15,11 +15,12 @@ bids = require('./routes/bid');
 
 
 app.get('/users/:id', users.findById);
-app.get('/getallrequests/:uname',requestrewards.getRequests)
+app.get('/getallrequests/:id',requestrewards.getRequests)
 app.post('/requestrewards/', requestrewards.addRequest);
 app.get('/getreqstatus/:id',requestrewards.findById);
 app.get('/getbidsrequest/:id',requestrewards.getBidsForRequest);
 app.get('/getreqstatusrewards/:userid',requestrewards.getRequestsRewards);
+app.get('/getlendrewards/:userid',requestrewards.getRequestsRewards)
 
 app.post('/bids/:id', bids.bidForRequest);
 app.post('/bids/accept', bids.acceptBid);

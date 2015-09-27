@@ -25,13 +25,15 @@ db.open(function(err, db) {
 exports.addRequest = function(req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
-    var reqObj = {cust_id : query.cust_id , reward_amt : query.reward_amt , request_status:"pending", request_date:query.request_date,return_date:"",bid_cust_id:"",bid_reward_amt:"",bid_days:"",bid_return_amt:""}
+    var cust_id = parseInt(query.cust_id,10);
+    var reward_amt = parseInt(query.reward_amt,10);
+    var reqObj = {cust_id : cust_id , reward_amt : reward_amt , request_status:"pending", request_date:query.request_date,return_date:"",bid_cust_id:"",bid_reward_amt:"",bid_days:"",bid_return_amt:""}
     db.collection('rewardrequest', function(err, collection) {
         collection.insert(reqObj, {safe:true}, function(err, result) {
             if (err) {
                 res.send({'error':'An error has occurred'});
             } else {
-                collection.find({cust_id: query.cust_id,request_status:"pending"}).toArray(function(err, items) {
+                collection.find({cust_id:cust_id,request_status:"pending"}).toArray(function(err, items) {
                 res.setHeader("Access-Control-Allow-Origin", "*");
                 res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
                 res.send(items);
@@ -52,13 +54,16 @@ exports.findById = function(req, res) {
 };
 
 exports.getRequests = function(req, res) {
-    var uname = req.params.uname;
+    var cust_id = parseInt(req.params.id,10);
+    console.log("asdasdas");
     db.collection('users', function(err, collection) {
-        collection.findOne({'username':uname}, function(err, item) {
-            console.log(item);
-            console.log(item.amount)
+        collection.findOne({'cust_id':cust_id}, function(err, item) {
+            var amount = parseInt(item.amount);
+            console.log(amount);
             db.collection('rewardrequest', function(err, collection) {
-                collection.find({$where: function() { return ( this.amount >   item.amount); } }).toArray(function(err, items) {
+                collection.find({$and :[ { 'cust_id': { $ne: cust_id } }, { 'reward_amt': { $lte: amount } } ]}).toArray(function(err, items) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
                 res.send(items);
                 });
             });
@@ -79,8 +84,8 @@ exports.getBidsForRequest = function(req, res) {
 };
 
 
-exports.getreqstatusrewards = function(req, res) {
-    var userid = req.params.userid;
+exports.getRequestsRewards = function(req, res) {
+    var userid = parseInt(req.params.userid,10);
     db.collection('rewardrequest', function(err, collection) {
         collection.find({cust_id: userid}).toArray(function(err, items) {
                 res.setHeader("Access-Control-Allow-Origin", "*");
