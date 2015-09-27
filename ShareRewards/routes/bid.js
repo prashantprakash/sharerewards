@@ -83,7 +83,7 @@ exports.acceptBid = function(req,res){
   //var bid_accepted = query.bid_accepted;
   var cust_id = query.cust_id;
   var bid_cust_id = query.bid_cust_id;
-  var reward_amt = query.reward_amt; // The amount loaned
+  var reward_amt = parseInt(query.reward_amt);
 
   var updateRequest = function(){
     // Get the details for the bid using bid_id
@@ -121,7 +121,7 @@ exports.acceptBid = function(req,res){
     table.update(
       {"cust_id": parseInt(bid_cust_id)},
       {
-        $inc: {"rewards_points": -parseInt(reward_amt)}
+        $inc: {"rewards_points": -reward_amt}
       },function(err,result){
         if (err) {
           res.send({'error':'An error has occurred in performTransaction 2'});
@@ -140,7 +140,7 @@ exports.acceptBid = function(req,res){
       table.update(
         {"cust_id": parseInt(cust_id)},
         {
-          $inc: {"rewards_points": parseInt(reward_amt)}
+          $inc: {"rewards_points": reward_amt}
         },function(err,result){
           if (err) {
             res.send({'error':'An error has occurred in performTransaction 1' + err});
@@ -154,8 +154,9 @@ exports.acceptBid = function(req,res){
     });
   };
 
-  /*db.collection('rewardrequest', function(err, collection) {
-    db.collection.update(
+
+/*  db.collection('rewardrequest', function(err, collection) {
+    collection.update(
       {"request_id": request_id},
       {
         $set: {"request_status": "Reward Loaned"}

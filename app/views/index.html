@@ -1,0 +1,263 @@
+<div ng-controller="DashBoardController as dash">
+  <!-- {{dash.customerId}} -->
+
+  <div id="wrapper">
+    <nav style="margin: 0; background-color: #22A996; height: 120px; border-bottom: 20px #28289E solid; ">
+      <div class="row">
+        <div class="col-xs-6" style="text-align:center;">
+          <img src="img/logo1.png" width="150px">
+        </div>
+        <div class="col-xs-4 col-xs-offset-2 nav-links">
+        </div>
+      </div>
+    </nav>
+
+    <div id="page-wrapper" style="margin-top:-50px">
+      <div class="container-fluid">
+        <div class="row">
+
+          <!-- Profile Section -->
+          <div class="col-xs-8">
+
+            <div class="row" style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 10px 0; margin: 15px 0;">
+              <div class="col-xs-4 col-md-offset-0">
+                <img class="row" src="{{dash.customerProfileData.img_url}}" height="200px" style="border-radius: 200px; margin:0" alt"Profile Image" width="100%">
+                <button type="button" class="row btn btn-primary" style="margin:10px; width:100%;" data-toggle="modal" data-target="#NotificationModal">Notifications <span style="background-color:red; border-radius:10px; border: 3px red solid;"> {{dash.notificationData.length}} </span></button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="NotificationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Notifications</h4>
+                      </div>
+                      <div class="modal-body">
+                        <table class="table table-bordered">
+                          <tr>
+                            <tr>
+                              <th>Requested Date</th>
+                              <th>Requested User</th>
+                              <th>Points</th>
+                              <th>Your Bid</th>
+                              <th>Decision</th>
+                            </tr>
+                          </tr>
+                          <tr ng-repeat="notification in dash.notificationData|orderBy:dash.sortBorrowTable.column:dash.sortBorrowTable.descending">
+                            <td>{{notification.request_date}}</td>
+                            <td>{{notification.cust_id}}</td>
+                            <td>{{notification.reward_amt}}</td>
+                            <td style="width:30%"><div class="input-group" style="width:100%">
+                              <div class="input-group-addon">$</div>
+                              <input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount" ng-model="notification.bid_reward_amt">
+                              <div class="input-group-addon">.00</div>
+                            </div></td>
+                            <td><span><button type="button" class="row btn btn-primary" style="margin:0" ng-if="!dash.bidData[$index]" ng-click="dash.placeNotification($index,notification.bid_reward_amt,notification._id)">Place Bid</button></span>
+                              <span><button type="button" class="row btn btn-primary" style="margin:0" ng-if="dash.bidData[$index]" ng-click="dash.placeNotification($index,notification.bid_reward_amt,notification._id)">Re-Bid</button></span>
+                              <span><button type="button" class="btn btn-danger" style="margin:0" ng-click="dash.removeNotification(notification._id)">Decline</button></span></td>
+                            </tr>
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+                <div class="col-xs-8">
+                  <table class="table table-striped" style="margin: 0">
+                    <tr>
+                      <td><b>Name</b></td>
+                      <td>{{dash.customerProfileData.username}}</td>
+                    </tr>
+                    <tr>
+                      <td><b>Account Number</b></td>
+                      <td>{{dash.customerProfileData.account_no}}</td>
+                    </tr>
+                    <tr>
+                      <td><b>Rewards Points</b></td>
+                      <td>{{dash.customerProfileData.rewards_points}} pts</td>
+                    </tr>
+                    <tr>
+                      <td><b>Address</b></td>
+                      <td>{{dash.customerProfileData.address}}</td>
+                    </tr>
+                    <tr>
+                      <td><b>Contact Info</b></td>
+                      <td><img src="http://images.clipartpanda.com/cell-phone-call-icon-35384.png" width=20px>: <u>+{{dash.customerProfileData.phone}}</u> <img src="https://cdn1.iconfinder.com/data/icons/simple-icons/4096/email-4096-black.png" width=20px>: <u>{{dash.customerProfileData.email_id}} </u></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+
+
+              <div class="row" style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 10px 0; margin: 15px 0;">
+                <form class="form-inline">
+                  <h5 style="margin:0; padding:0 10px;" class="inline">Request Reward Points:</h5>
+                  <div class="form-group">
+                    <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
+                    <div class="input-group">
+                      <div class="input-group-addon">Pts.</div>
+                      <input type="text" class="form-control" id="exampleInputAmount" placeholder="Reward Points" ng-model="dash.requestAmount">
+                      <div class="input-group-addon">.00</div>
+                    </div>
+                  </div>
+                  <button type="submit" ng-click="dash.submitRequest()" class="btn btn-primary" style="margin-left:220px">Request Rewards</button>
+                </form>
+              </div>
+
+              <div class="row">
+                <div style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 10px 0; margin: 15px; min-height:450px; padding:20px">
+
+                  <h3 style="margin:0 auto; text-align:center;"> Lend Table</h3>
+                  <table class="table table-hover">
+                    <tr>
+                      <tr>
+                        <th>Request Date <img ng-click="dash.changeSorting('request_date', 2)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Lend To <img ng-click="dash.changeSorting('text', 2)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Points <img ng-click="dash.changeSorting('bid_reward_amt', 2)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Days Remaining <img ng-click="dash.changeSorting('bid_reward_amt', 2)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      </tr>
+                    </tr>
+                    <tr ng-repeat="lend in dash.lendTable|orderBy:dash.sortLendTable.column:dash.sortLendTable.descending">
+                      <td>{{lend.request_date}}</td>
+                      <td>{{lend.text}}</td>
+                      <td>{{lend.bid_reward_amt}}</td>
+                      <td>{{lend.availability}}</td>
+                    </tr>
+                  </table>
+
+
+                  <h3 style="margin:0 auto; text-align:center;"> Borrow Table</h3>
+                  <table class="table table-hover">
+                    <tr>
+                      <tr>
+                        <th>Request Date <img ng-click="dash.changeSorting('request_date', 3)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Borrowed From <img ng-click="dash.changeSorting('bid_cust_id', 3)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Points <img ng-click="dash.changeSorting('reward_amt', 3)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Days Remaining <img ng-click="dash.changeSorting('availability', 3)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Status <img ng-click="dash.changeSorting('request_status', 3)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                        <th>Pay Back</th>
+                      </tr>
+                    </tr>
+                    <tr ng-repeat="borrow in dash.borrowTable|orderBy:dash.sortBorrowTable.column:dash.sortBorrowTable.descending">
+                      <td>{{borrow.request_date}}</td>
+                      <td>{{borrow.bid_cust_id}}</td>
+                      <td>{{borrow.reward_amt}}</td>
+                      <td>{{borrow.bid_days}}</td>
+                      <td ng-if="dash.getAllBids[$index].length > 0"><button ng-click="dash.bidOpenModal($index)" type="button" class="row btn btn-primary" style="margin:0; width:100%;" data-toggle="modal" data-target="#BidsModal">Open Bids <span style="background-color:red; border-radius:10px; border: 3px red solid;"> {{dash.getAllBids[$index].length}} </span></button></td>
+                      <td ng-if="dash.getAllBids[$index].length <= 0">{{borrow.request_status}}</td>
+                      <td><button type="button" class="row btn btn-primary" style="margin:0" ng-click="dash.payBack(borrow._id)">Pay</button></td>
+                    </tr>
+                  </table>
+
+                  <!-- Modal -->
+                  <div class="modal fade" id="BidsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog modal-lg" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title" id="myModalLabel">Bids</h4>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table table-bordered">
+                            <tr>
+                              <tr>
+                                <th>Requested Date</th>
+                                <th>Bidder</th>
+                                <th>Bid</th>
+                                <th>Bid Days</th>
+                                <th>Decision</th>
+                              </tr>
+                            </tr>
+                            <tr ng-repeat="bids in dash.getAllBids[dash.bidIndexModalOpen]">
+                              <td>{{bids.bid_date}}</td>
+                              <td>{{bids.bid_cust_id}}</td>
+                              <td>{{bids.bid_reward_amt}}</td>
+                              <td>{{bids.bid_days}}</td>
+                              <td><span><button type="button" class="row btn btn-primary" style="margin:0" ng-click="dash.acceptBid(dash.getAllBids[dash.bidIndexModalOpen], dash.bidIndexModalOpen)">Accept</button></span>
+                                <span><button type="button" class="btn btn-danger" style="margin:0" ng-click="dash.declineBid(dash.bidIndexModalOpen)">Decline</button></span></td>
+                              </tr>
+                            </table>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  <h3 style="margin:0 auto; text-align:center;"> Activity Table</h3>
+                  <table class="table table-hover">
+                    <tr>
+                      <th>Request Date <img ng-click="dash.changeSorting('request_date', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      <th>Return Date <img ng-click="dash.changeSorting('return_date', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      <th>Borrower <img ng-click="dash.changeSorting('bid_cust_id', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      <th>Lender <img ng-click="dash.changeSorting('cust_id', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      <th>Points <img ng-click="dash.changeSorting('reward_amt', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                      <th>Status <img ng-click="dash.changeSorting('request_status', 1)" src="https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-256.png" width="15px"></th>
+                    </tr>
+                    <tr ng-repeat="activity in dash.activityTable|orderBy:dash.sortActivityTable.column:dash.sortActivityTable.descending">
+                      <td>{{activity.request_date}}</td>
+                      <td>{{activity.return_date}}</td>
+                      <td>{{activity.bid_cust_id}}</td>
+                      <td>{{activity.cust_id}}</td>
+                      <td>{{activity.reward_amt}}</td>
+                      <td>{{activity.request_status}}</td>
+                    </tr>
+                  </table>
+
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Live Feed -->
+            <div class="col-xs-4" style="margin-top: 15px">
+              <div style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 10px 0; min-height:450px;">
+                <div ng-repeat="feed in dash.liveFeed">
+                  <div class="row">
+                    <div class="col-xs-4">
+                      <img src={{feed.img}}>
+                    </div>
+                    <div class="col-xs-8">
+                      <span>{{feed.parta}}{{feed.action}}{{feed.partb}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="background-color: #f5f5f5; border: 1px solid #ccc; border-radius: 4px; padding: 10px 0; min-height:350px; margin-top:15px">
+                <div charts-display></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="user_login">
+    <form>
+        <label>Email / Username</label> <input type="text"><br>
+        <label>Password</label> <input type="password"><br>
+ 
+        <div class="checkbox">
+            <input id="remember" type="checkbox"> <label for=
+            "remember">Remember me on this computer</label>
+        </div>
+ 
+        <div class="action_btns">
+            <div class="one_half">
+                <a class="btn back_btn" href="#">Back</a>
+            </div>
+ 
+            <div class="one_half last">
+                <a class="btn btn_red" href="#">Login</a>
+            </div>
+        </div>
+    </form>
+    
+    <a class="forgot_password" href="#">Forgot password?</a>
+</div>

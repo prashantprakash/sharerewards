@@ -1,4 +1,5 @@
 var mongo = require('mongodb');
+var url = require('url');
 
 var Server = mongo.Server,
     Db = mongo.Db,
@@ -20,11 +21,15 @@ db.open(function(err, db) {
 });
 
 exports.findById = function(req, res) {
-    var uname = req.params.username;
-    var pwd = req.params.password
+    var url_parts = url.parse(req.url, true);
+    var query = url_parts.query;
+    var uname = query.username;
+    var pwd = query.password
     console.log('Retrieving user: ' + uname);
     db.collection('users', function(err, collection) {
         collection.findOne({'username':uname,'password':pwd}, function(err, item) {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
             res.send(item);
         });
     });
