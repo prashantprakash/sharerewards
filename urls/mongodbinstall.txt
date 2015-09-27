@@ -1,0 +1,16 @@
+curl -O https://fastdl.mongodb.org/osx/mongodb-osx-x86_64-3.0.6.tgz
+
+tar -zxvf mongodb-osx-x86_64-3.0.6.tgz
+
+
+mkdir -p mongodb
+
+cp -R -n mongodb-osx-x86_64-3.0.6/ mongodb
+
+export PATH=/Users/Prashant/mongodb/bin:$PATH
+
+mkdir -p data/db
+
+mongod --dbpath data/db
+
+start mongo from bin folder
