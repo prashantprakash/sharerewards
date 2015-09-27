@@ -19,6 +19,7 @@ app.get('/getallrequests/:uname',requestrewards.getRequests)
 app.post('/requestrewards/', requestrewards.addRequest);
 app.get('/getreqstatus/:id',requestrewards.findById);
 app.get('/getbidsrequest/:id',requestrewards.getBidsForRequest);
+app.get('/getreqstatusrewards/:userid',requestrewards.getRequestsRewards);
 
 app.post('/bids/:id', bids.bidForRequest);
 app.post('/bids/accept', bids.acceptBid);
