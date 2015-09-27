@@ -99,5 +99,17 @@ exports.getRequestsRewards = function(req, res) {
     
 };
 
+exports.getLendRewards = function(req, res) {
+    var userid = parseInt(req.params.userid,10);
+    db.collection('rewardrequest', function(err, collection) {
+        collection.find({bid_cust_id: userid , request_status : {$ne :'pending'}}).toArray(function(err, items) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
+                res.send(items);
+        });
+    });
+    
+};
+
 
 

@@ -28,6 +28,8 @@ exports.findById = function(req, res) {
     console.log('Retrieving user: ' + uname);
     db.collection('users', function(err, collection) {
         collection.findOne({'username':uname,'password':pwd}, function(err, item) {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
             res.send(item);
         });
     });
