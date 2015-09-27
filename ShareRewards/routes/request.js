@@ -25,7 +25,7 @@ db.open(function(err, db) {
 exports.addRequest = function(req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
-    var reqObj = {cust_id : query.cust_id , reward_amt : query.reward_amt , request_status:"pending", request_date:query.request_date,return_date:"",bid_cust_id:"",bid_reward_amt:"",bit_days:"",bid_return_amt:""}
+    var reqObj = {cust_id : query.cust_id , reward_amt : query.reward_amt , request_status:"pending", request_date:query.request_date,return_date:"",bid_cust_id:"",bid_reward_amt:"",bid_days:"",bid_return_amt:""}
     db.collection('rewardrequest', function(err, collection) {
         collection.insert(reqObj, {safe:true}, function(err, result) {
             if (err) {
@@ -65,5 +65,18 @@ exports.getRequests = function(req, res) {
     });
     
 };
+
+
+exports.getBidsForRequest = function(req, res) {
+    var requestid = req.params.requestid;
+    db.collection('bids', function(err, collection) {
+        collection.find({request_id: requestid}).toArray(function(err, items) {
+                res.send(items);
+        });
+    });
+    
+};
+
+
 
 

@@ -16,8 +16,9 @@ bids = require('./routes/bid');
 
 app.get('/users/:id', users.findById);
 app.get('/getallrequests/:uname',requestrewards.getRequests)
-app.get('/requestrewards/', requestrewards.addRequest);
+app.post('/requestrewards/', requestrewards.addRequest);
 app.get('/getreqstatus/:id',requestrewards.findById);
+app.get('/getbidsrequest/:id',requestrewards.getBidsForRequest);
 
 app.post('/bids/:id', bids.bidForRequest);
 app.post('/bids/accept', bids.acceptBid);
