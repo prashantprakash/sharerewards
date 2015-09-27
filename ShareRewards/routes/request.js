@@ -42,8 +42,8 @@ exports.findById = function(req, res) {
     var id = req.params.id;
     console.log('Retrieving status: ' + id);
     db.collection('rewardrequest', function(err, collection) {
-        collection.findOne({'_id':new BSON.ObjectID(id)}, function(err, item) {
+        collection.findOne({'_id':new mongo.ObjectID(id)}, function(err, item) {
             res.send(item);
-        });
+        }); 
     });
 };
