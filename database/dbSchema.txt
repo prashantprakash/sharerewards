@@ -1,0 +1,33 @@
+************** database schema **************
+Users
+cust_id | username | password
+
+Requests
+request_id | cust_id | reward_amt | request_status | request_date | return_date | bid_cust_id | bid_reward_amt | bit_days | bid_return_amt
+
+	- request_id -- pKey, auto incr
+	- cust_id -- cust_id who has request for loan
+	- reward_amt -- reward points, a customer wants to loan
+	- request_status -- one of the many statuses [Pending, x bids(bidding started), Reward Loaned(bid approved),Reward Returned, Reward Overdue]
+	- request_date -- date the request was generated
+*	- return_date -- decided based on the bid_days and current date
+*	- bid_cust_id -- The customer whose bid has been accepted
+*	- bid_reward_amt -- return amnt decided by the bidder
+*	- bit_days -- days decided by the user
+**	- bid_return_amt -- return amnt might differ from bid_reward_amt, if the cust fails to return before say 120 days!
+
+* These fields are copied into the table from, BIDS table, when the request_status is changed to 'Reward Loaned'. Now the rows for this request id can be deleted from the BIDS table
+** This will be same as bid_reward_amt until return_data. Then some penalty will be applied, say 100pts/day.
+
+Bids
+bid_id | request_id | bid_cust_id | bid_reward_amt | bid_days | bid_date
+
+	- bid_id -- pKey, auto incr
+	- request_id
+	- bid_cust_id
+	- bid_reward_amt
+	- bid_days
+	- bid_date
+
+Transactions
+	- As of now, not needed
