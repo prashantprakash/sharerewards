@@ -32,6 +32,8 @@ exports.addRequest = function(req, res) {
                 res.send({'error':'An error has occurred'});
             } else {
                 console.log('Success: ' + JSON.stringify(result));
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
                 res.send(result);
             }
         });
@@ -47,3 +49,21 @@ exports.findById = function(req, res) {
         }); 
     });
 };
+
+exports.getRequests = function(req, res) {
+    var uname = req.params.uname;
+    db.collection('users', function(err, collection) {
+        collection.findOne({'username':uname}, function(err, item) {
+            console.log(item);
+            console.log(item.amount)
+            db.collection('rewardrequest', function(err, collection) {
+                collection.find({$where: function() { return ( this.amount >   item.amount); } }).toArray(function(err, items) {
+                res.send(items);
+                });
+            });
+        }); 
+    });
+    
+};
+
+

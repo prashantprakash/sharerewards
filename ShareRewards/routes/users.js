@@ -20,10 +20,11 @@ db.open(function(err, db) {
 });
 
 exports.findById = function(req, res) {
-    var id = req.params.id;
-    console.log('Retrieving user: ' + id);
+    var uname = req.params.username;
+    var pwd = req.params.password
+    console.log('Retrieving user: ' + uname);
     db.collection('users', function(err, collection) {
-        collection.findOne({'user_id':id}, function(err, item) {
+        collection.findOne({'username':uname,'password':pwd}, function(err, item) {
             res.send(item);
         });
     });
