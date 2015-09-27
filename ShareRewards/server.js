@@ -11,13 +11,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //app.set('appUtil',appUtil);
 requestrewards = require('./routes/request');
 users = require('./routes/users');
-bids = require('./routes/bids');
+bids = require('./routes/bid');
 
 
 app.get('/users/:id', users.findById);
 app.get('/requestrewards/', requestrewards.addRequest);
 app.get('/getreqstatus/:id',requestrewards.findById);
 
+app.post('/bids/:id', bids.bidForRequest);
+app.post('/bids/accept', bids.acceptBid);
 
 //app.post('/login', login.doLogin);
 
