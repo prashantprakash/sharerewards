@@ -10,6 +10,15 @@ db.users.insert({cust_id:101 , username:"John" , password: "Alex" , address:"774
 
 db.users.insert({cust_id:102 , username:"alisha" , password: "Alisha" , address:"7740 McCallum TX-75085",phone :'6126789012',email_id:'alisha_rocking@gmail.com',rewards_points:1600 , account_no:'912345689012'})
 
+// add image url component 
+
+db.users.update({cust_id: 100}, {$set :{img_url:"http://vignette3.wikia.nocookie.net/fanon/images/e/e1/Joey-10-years-later-still-friends-where-are-monica-phoebe-joey-rachel-ross-chandler-now.jpeg/revision/latest?cb=20140902202656"}})
+
+db.users.update({cust_id: 101}, {$set :{img_url:"http://images.fanpop.com/images/image_uploads/Chandler-Bing-chandler-bing-129846_293_360.jpg"}})
+
+
+db.users.update({cust_id: 102}, {$set :{img_url:"https://nypdecider.files.wordpress.com/2014/09/friends-ross.png"}})
+
 Requests
 request_id | cust_id | reward_amt | request_status | request_date | return_date | bid_cust_id | bid_reward_amt | bit_days | bid_return_amt
 
