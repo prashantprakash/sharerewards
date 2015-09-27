@@ -9,7 +9,7 @@ var Server = mongo.Server,
   Db = mongo.Db,
   BSON = mongo.BSONPure;
 
-var server = new Server('localhost', 27017, {auto_reconnect: true});
+var server = new Server('10.33.62.106', 27017, {auto_reconnect: true});
 db = new Db('sharerewards', server);
 
 db.open(function(err, db) {
@@ -26,7 +26,7 @@ db.open(function(err, db) {
 exports.bidForRequest = function(req,res){
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
-  console.log(query); 
+  console.log(query);
   var request_id = query.id;
   var bid_cust_id = parseInt(query.bid_cust_id,10);
   var bid_reward_amt = parseInt(query.bid_reward_amt,10);
@@ -61,7 +61,7 @@ exports.bidForRequest = function(req,res){
             });
           });
             res.setHeader("Access-Control-Allow-Origin", "*");
-            res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
+            res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
             res.send(result);
           }
         });
@@ -77,45 +77,56 @@ exports.reBidForRequest = function(){
 exports.acceptBid = function(req,res){
   var url_parts = url.parse(req.url, true);
   var query = url_parts.query;
-  console.log(query); 
+  console.log(query);
   var bid_id = query.bid_id;
   var request_id = query.request_id;
-  var bid_accepted = query.bid_accepted;
+  //var bid_accepted = query.bid_accepted;
   var cust_id = query.cust_id;
   var bid_cust_id = query.bid_cust_id;
-  var reward_amt = query.reward_amt;
+  var reward_amt = query.reward_amt; // The amount loaned
 
   var updateRequest = function(){
+    // Get the details for the bid using bid_id
     db.collection('bids', function(err, table) {
-      table.findOne({'_id':new mongo.ObjectID(bid_id)}, function(err, item) {
+      table.findOne({'_id':new mongo.ObjectID(bid_id)}, function(err, result) {
         if(err){
-          res.send({'error':'An error has occurred'});
+          res.send({'error':'An error has occurred in finding bid for update request'});
         } else {
           console.log('Success - update : ' + JSON.stringify(result));
-          delete result._Id;
+          delete result._id;
+          delete result.request_id;
 
-          db.collection('rewardrequest',function(err,table){
-            table.update({'_Id' : request_id},{$set : result}),function(err,result){
-              res.setHeader("Access-Control-Allow-Origin", "*");
-              res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
-              res.send(result);
-            };
+          // update the rewardrequest row with bid values.
+          db.collection('rewardrequest', function (err, table) {
+            console.log('Now, update in rewards request ',JSON.stringify(result));
+            result.request_status = "Reward Loaned";
+            table.update({'_id': new mongo.ObjectID(request_id)}, {$set: result}, function (err, result) {
+              if (err) {
+                res.send({'error': 'An error has occurred in update request'});
+              } else {
+                console.log('Success - update in update request : ' + JSON.stringify(result));
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With");
+
+                res.send(result);
+              }
+            });
           });
         }
-      });
+    });
     });
   };
 
   var performTransaction2 = function(table){
     table.update(
-      {"cust_id": cust_id},
+      {"cust_id": parseInt(bid_cust_id)},
       {
-        $inc: {"amount": -reward_amt}
+        $inc: {"rewards_points": -parseInt(reward_amt)}
       },function(err,result){
         if (err) {
-          res.send({'error':'An error has occurred'});
+          res.send({'error':'An error has occurred in performTransaction 2'});
         } else {
-          console.log('Success - update : ' + JSON.stringify(result));
+          console.log('Success - update in performTransaction 2 : ' + JSON.stringify(result));
           //res.send(result);
 
           // Second transaction complete.
@@ -127,14 +138,14 @@ exports.acceptBid = function(req,res){
   var performTransaction1 = function(){
     db.collection('users', function(err, table) {
       table.update(
-        {"cust_id": cust_id},
+        {"cust_id": parseInt(cust_id)},
         {
-          $inc: {"amount": reward_amt}
+          $inc: {"rewards_points": parseInt(reward_amt)}
         },function(err,result){
           if (err) {
-            res.send({'error':'An error has occurred'});
+            res.send({'error':'An error has occurred in performTransaction 1' + err});
           } else {
-            console.log('Success - update : ' + JSON.stringify(result));
+            console.log('Success - update in performTransaction 1 : ' + JSON.stringify(result));
             //res.send(result);
 
             performTransaction2(table);
@@ -143,7 +154,7 @@ exports.acceptBid = function(req,res){
     });
   };
 
-  db.collection('rewardrequest', function(err, collection) {
+  /*db.collection('rewardrequest', function(err, collection) {
     db.collection.update(
       {"request_id": request_id},
       {
@@ -154,8 +165,10 @@ exports.acceptBid = function(req,res){
         } else {
           console.log('Success - update : ' + JSON.stringify(result));
           //res.send(result);
-          performTransaction1();
+
         }
     });
-  });
+  });*/
+
+  performTransaction1();
 };
