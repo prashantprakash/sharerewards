@@ -19,7 +19,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/users/:id', users.findById);
+app.get('/users/', users.findById);
 app.get('/getallrequests/:id',requestrewards.getRequests)
 app.post('/requestrewards/', requestrewards.addRequest);
 app.get('/getreqstatus/:id',requestrewards.findById);

@@ -83,7 +83,7 @@ exports.acceptBid = function(req,res){
   var bid_accepted = query.bid_accepted;
   var cust_id = query.cust_id;
   var bid_cust_id = query.bid_cust_id;
-  var reward_amt = query.reward_amt;
+  var reward_amt = parseInt(query.reward_amt);
 
   var updateRequest = function(){
     db.collection('bids', function(err, table) {
@@ -91,14 +91,14 @@ exports.acceptBid = function(req,res){
         if(err){
           res.send({'error':'An error has occurred'});
         } else {
-          console.log('Success - update : ' + JSON.stringify(result));
-          delete result._Id;
+          console.log('Success - update : ' + JSON.stringify(item));
+          delete item._Id;
 
           db.collection('rewardrequest',function(err,table){
-            table.update({'_Id' : request_id},{$set : result}),function(err,result){
+            table.update({'_Id' : new mongo.ObjectID(request_id)},{$set : {bid_cust_id:bid_cust_id,request_status:bid_accepted,bid_reward_amt:reward_amt}}),function(err,item){
               res.setHeader("Access-Control-Allow-Origin", "*");
               res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
-              res.send(result);
+              res.send(item);
             };
           });
         }
@@ -144,7 +144,7 @@ exports.acceptBid = function(req,res){
   };
 
   db.collection('rewardrequest', function(err, collection) {
-    db.collection.update(
+    collection.update(
       {"request_id": request_id},
       {
         $set: {"request_status": "Reward Loaned"}
