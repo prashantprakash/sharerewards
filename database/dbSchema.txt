@@ -1,6 +1,14 @@
 ************** database schema **************
 Users
-cust_id | username | password
+cust_id | username | password | address | phone | email_id | rewards_points | account_no 
+
+// insert statements for 
+
+db.users.insert({cust_id:100 , username:"Alex" , password: "Alex" , address:"7795 McCallum TX-75252",phone :'4126789012',email_id:'alex_cool@gmail.com',rewards_points:1000 , account_no:'123456789012'})
+
+db.users.insert({cust_id:101 , username:"John" , password: "Alex" , address:"7740 McCallum TX-75252",phone :'5126789012',email_id:'john_hot@gmail.com',rewards_points:1400 , account_no:'512345689012'})
+
+db.users.insert({cust_id:102 , username:"alisha" , password: "Alisha" , address:"7740 McCallum TX-75085",phone :'6126789012',email_id:'alisha_rocking@gmail.com',rewards_points:1600 , account_no:'912345689012'})
 
 Requests
 request_id | cust_id | reward_amt | request_status | request_date | return_date | bid_cust_id | bid_reward_amt | bit_days | bid_return_amt
