@@ -10,7 +10,7 @@
   function customerInfo($http, $q){
 
     var IPADDRESS = "10.33.62.106:3000";
-    var loginCustomer = "1123";
+    var loginCustomer = "112333";
     var bidDays = "10";
     var Uname = "Alex",
         password = "Alex";
