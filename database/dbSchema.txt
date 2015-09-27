@@ -1,3 +1,4 @@
+************** database schema **************
 Users
 cust_id | username | password
 
