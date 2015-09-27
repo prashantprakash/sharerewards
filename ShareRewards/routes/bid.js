@@ -88,7 +88,7 @@ exports.acceptBid = function(req,res){
     table.update(
       {"cust_id": cust_id},
       {
-        $inc: {"amount": reward_amt}
+        $inc: {"amount": -reward_amt}
       },function(err,result){
         if (err) {
           res.send({'error':'An error has occurred'});
@@ -98,7 +98,6 @@ exports.acceptBid = function(req,res){
 
           // Second transaction complete.
           // Now notify the bidder.
-
           updateRequest();
         }
       });
