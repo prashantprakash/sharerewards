@@ -58,17 +58,37 @@ exports.reBidForRequest = function(){
 };
 
 exports.acceptBid = function(req,res){
+  var bid_id = req.body.bid_id;
   var request_id = req.body.request_id;
   var bid_accepted = req.body.bid_accepted;
   var cust_id = req.body.cust_id;
   var bid_cust_id = req.body.bid_cust_id;
   var reward_amt = req.body.reward_amt;
 
+  var updateRequest = function(){
+    db.collection('bids', function(err, table) {
+      table.findOne({'_id':new mongo.ObjectID(bid_id)}, function(err, item) {
+        if(err){
+          res.send({'error':'An error has occurred'});
+        } else {
+          console.log('Success - update : ' + JSON.stringify(result));
+          delete result._Id;
+
+          db.collection('rewardrequest',function(err,table){
+            table.update({'_Id' : request_id},{$set : result}),function(err,result){
+              res.send(result);
+            };
+          });
+        }
+      });
+    });
+  };
+
   var performTransaction2 = function(table){
     table.update(
       {"cust_id": cust_id},
       {
-        $inc: {"amount": reward_amt}
+        $inc: {"amount": -reward_amt}
       },function(err,result){
         if (err) {
           res.send({'error':'An error has occurred'});
@@ -78,6 +98,7 @@ exports.acceptBid = function(req,res){
 
           // Second transaction complete.
           // Now notify the bidder.
+          updateRequest();
         }
       });
   };
