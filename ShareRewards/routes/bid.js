@@ -3,12 +3,13 @@
  */
 
 var mongo = require('mongodb');
+var url = require('url');
 
 var Server = mongo.Server,
   Db = mongo.Db,
   BSON = mongo.BSONPure;
 
-var server = new Server('10.33.62.106', 27017, {auto_reconnect: true});
+var server = new Server('localhost', 27017, {auto_reconnect: true});
 db = new Db('sharerewards', server);
 
 db.open(function(err, db) {
@@ -23,10 +24,13 @@ db.open(function(err, db) {
 });
 
 exports.bidForRequest = function(req,res){
-  var request_id = req.body.id;
-  var bid_cust_id = req.body.bid_cust_id;
-  var bid_reward_amt = req.body.bid_reward_amt;
-  var bid_days = req.body.bid_days;
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  console.log(query); 
+  var request_id = query.id;
+  var bid_cust_id = parseInt(query.bid_cust_id,10);
+  var bid_reward_amt = parseInt(query.bid_reward_amt,10);
+  var bid_days = parseInt(query.bid_days,10);
   var currentTime = new Date();
 
   db.collection('bids', function(err, table) {
@@ -45,6 +49,19 @@ exports.bidForRequest = function(req,res){
             res.send({'error': 'An error has occurred'});
           } else {
             console.log('Success: ' + JSON.stringify(result));
+            // update request table to bidon
+            db.collection('users', function(err, collection) {
+                collection.update({'_id':new mongo.ObjectID(request_id)},{$set : {request_status : "bidon"}}, {safe:true}, function(err, result) {
+                  if (err) {
+                    console.log('Error updating wine: ' + err);
+                    res.send({'error':'An error has occurred'});
+                  } else {
+                    console.log('' + result + ' document(s) updated');
+                }
+            });
+          });
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
             res.send(result);
           }
         });
@@ -58,12 +75,15 @@ exports.reBidForRequest = function(){
 };
 
 exports.acceptBid = function(req,res){
-  var bid_id = req.body.bid_id;
-  var request_id = req.body.request_id;
-  var bid_accepted = req.body.bid_accepted;
-  var cust_id = req.body.cust_id;
-  var bid_cust_id = req.body.bid_cust_id;
-  var reward_amt = req.body.reward_amt;
+  var url_parts = url.parse(req.url, true);
+  var query = url_parts.query;
+  console.log(query); 
+  var bid_id = query.bid_id;
+  var request_id = query.request_id;
+  var bid_accepted = query.bid_accepted;
+  var cust_id = query.cust_id;
+  var bid_cust_id = query.bid_cust_id;
+  var reward_amt = query.reward_amt;
 
   var updateRequest = function(){
     db.collection('bids', function(err, table) {
@@ -76,6 +96,8 @@ exports.acceptBid = function(req,res){
 
           db.collection('rewardrequest',function(err,table){
             table.update({'_Id' : request_id},{$set : result}),function(err,result){
+              res.setHeader("Access-Control-Allow-Origin", "*");
+              res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
               res.send(result);
             };
           });

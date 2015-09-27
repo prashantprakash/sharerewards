@@ -74,9 +74,12 @@ exports.getRequests = function(req, res) {
 
 
 exports.getBidsForRequest = function(req, res) {
-    var requestid = req.params.requestid;
+    var requestid = req.params.id;
+    console.log(requestid);
     db.collection('bids', function(err, collection) {
         collection.find({request_id: requestid}).toArray(function(err, items) {
+                res.setHeader("Access-Control-Allow-Origin", "*");
+                res.setHeader("Access-Control-Allow-Headers", "X-Requested-With"); 
                 res.send(items);
         });
     });

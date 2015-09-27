@@ -27,7 +27,7 @@ app.get('/getbidsrequest/:id',requestrewards.getBidsForRequest);
 app.get('/getreqstatusrewards/:userid',requestrewards.getRequestsRewards);
 app.get('/getlendrewards/:userid',requestrewards.getRequestsRewards)
 
-app.post('/bids/:id', bids.bidForRequest);
+app.post('/placebids/', bids.bidForRequest);
 app.post('/bids/accept', bids.acceptBid);
 
 //app.post('/login', login.doLogin);
